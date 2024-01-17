@@ -1,0 +1,10 @@
+# print(f"Access Token: {api_key}")
+
+    try:
+        decoded_payload = jwt.decode(jwt_token, merchant_secret, algorithms=["HS256"])
+        print("Token is valid. Payload:", decoded_payload)
+        return jsonify({'message': 'Token is valid', 'payload': decoded_payload}), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({'error': 'Token has expired'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'error': 'Invalid token'}), 401

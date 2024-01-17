@@ -1,27 +1,39 @@
-from flask import Flask
-from pesapal_py.payments import PesaPal
-import jwt
+from flask import Flask, jsonify
 import requests
+import auth
 
 app = Flask(__name__)
 
 
 @app.route('/pesapal/iframeGen', methods=['POST'])
 def get_iframe_url():
-    # utilizing the demo-keys provided by pesapal sandbox
-    merchant_key = 'qkio1BGGYAXTu2JOfm7XSXNruoZsrqEW'
-    merchant_secret = 'osGQ364R49cXKeOYSpaOnT++rHs='
+    token = auth.authentication()
 
-    pesapal = PesaPal(merchant_key, merchant_secret)
-    auth = pesapal.authenticate()
-    api_key = auth['token']
-
-    merchant_info = {
-        'consumer_key': merchant_key,
-        'api_key': api_key,
+    api_url = " https://cybqa.pesapal.com/pesapalv3/api/Transactions/SubmitOrderRequest"
+    headers = {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
     }
-    # encode the merchant info into a jwt token
-    jwt_token = jwt.encode(merchant_info, merchant_secret, algorithm='HS256')
+    payload = {
+        "Amount": 1000,
+        "Description": 'Sample payment description',
+        "Type": "MERCHANT",
+        "Reference": "sample_transaction_id",
+        "PhoneNumber": "254722001122",
+        "Email": "ariesmanga@outlook.com",
+        "Currency": "KES",
+        "CallbackUrl": 'https://google.com',
+    }
+    response = requests.post(api_url, headers=headers, json=payload)
+
+    # print(f"Response Content: {response.text}")
+    # return {'message': response.text}, response.status_code
+
+    if response.status_code == 200:
+        iframe_url = response.json()
+        return {'iframe_url': iframe_url}
+    else:
+        return {'message': response.text}, response.status_code
 
 
 if __name__ == '__main__':
