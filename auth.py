@@ -4,12 +4,12 @@ from pesapal_py.payments import PesaPal
 
 
 def authentication():
-    # Utilizing the demo-keys provided by Pesapal sandbox
+    # Utilizing the demo-keys provided by Pesapal Sandbox in their documentation
     global auth_response
     merchant_key = 'qkio1BGGYAXTu2JOfm7XSXNruoZsrqEW'
     merchant_secret = 'osGQ364R49cXKeOYSpaOnT++rHs='
 
-    pesapal = PesaPal(merchant_key, merchant_secret)  # Assuming you have defined the PesaPal class
+    pesapal = PesaPal(merchant_key, merchant_secret)
     auth = pesapal.authenticate()
     api_key = auth['token']
 
@@ -33,4 +33,3 @@ def authentication():
         print(f"Error during API request: {e}")
 
     return auth_response.json()['token']
-
